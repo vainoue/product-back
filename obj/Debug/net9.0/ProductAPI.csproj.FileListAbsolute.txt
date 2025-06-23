@@ -132,3 +132,4 @@ C:\Users\vitor\OneDrive\Documentos\Canadá\Dotnet\ProductAPI\obj\Debug\net9.0\Pr
 C:\Users\vitor\OneDrive\Documentos\Canadá\Dotnet\ProductAPI\obj\Debug\net9.0\ref\ProductAPI.dll
 C:\Users\vitor\OneDrive\Documentos\Canadá\Dotnet\ProductAPI\bin\Debug\net9.0\package-lock.json
 C:\Users\vitor\OneDrive\Documentos\Canadá\Dotnet\ProductAPI\bin\Debug\net9.0\package.json
+C:\Users\vitor\OneDrive\Documentos\Canadá\Dotnet\ProductAPI\obj\Debug\net9.0\ProductAPI.sourcelink.json
