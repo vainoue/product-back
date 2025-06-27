@@ -35,11 +35,69 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] User user)
     {
+        if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
+            return BadRequest("Username and password are required");
+
         var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username.ToLower() && u.Password == user.Password);
         if (dbUser == null)
             return Unauthorized(new { message = "Invalid username or password" });
 
-        return Ok(new { username = dbUser.Username });
+        return Ok(new { id = dbUser.Id, username = dbUser.Username, email = dbUser.Email, birthdate = dbUser.Birthdate, photo = dbUser.Photo });
+    }
+
+    [HttpPut("update")]
+    public async Task<IActionResult> Update([FromBody] User user)
+    {
+        var updateUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+        if (updateUser == null)
+            return BadRequest("User not found");
+
+        if (!string.IsNullOrWhiteSpace(user.Email))
+            updateUser.Email = user.Email;
+
+        if (user.Birthdate.HasValue)
+        {
+            var utcBirthdate = DateTime.SpecifyKind(user.Birthdate.Value, DateTimeKind.Utc);
+            updateUser.Birthdate = utcBirthdate;
+        }
+            
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "User updated successfully" });
+    }
+
+    [HttpPut("update-photo")]
+    public async Task<IActionResult> UpdatePhoto([FromForm] int userId, [FromForm] IFormFile file)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return NotFound("User not found!");
+
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded");
+
+        using var image = new MemoryStream();
+        await file.CopyToAsync(image);
+        user.Photo = image.ToArray();
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Photo uploaded successfully!" });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _context.Users.Select(u => new
+        {
+            u.Id,
+            u.Username,
+            u.Email,
+            u.Birthdate,
+            u.Photo
+        })
+        .ToListAsync();
+
+        return Ok(users);
     }
 
 }
