@@ -19,13 +19,12 @@ public class UsersController : ControllerBase
         if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
             return BadRequest("Username and password are required");
 
-        var lowerUsername = user.Username.ToLower();
-
-        var existUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == lowerUsername);
+        var normalizedUsername = user.Username.Trim().ToLower();
+        var existUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == normalizedUsername);
         if (existUser != null)
             return BadRequest("Username already exists");
 
-        user.Username = lowerUsername;
+        user.Username = normalizedUsername;
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -38,7 +37,8 @@ public class UsersController : ControllerBase
         if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
             return BadRequest("Username and password are required");
 
-        var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username.ToLower() && u.Password == user.Password);
+        var normalizedUsername = user.Username.Trim().ToLower();
+        var dbUser = await _context.Users.FirstOrDefaultAsync(u => u.Username.Trim().ToLower() == normalizedUsername && u.Password == user.Password);
         if (dbUser == null)
             return Unauthorized(new { message = "Invalid username or password" });
 
